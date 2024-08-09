@@ -15,6 +15,8 @@ from datetime import date
 import os
 import image_lib
 import sys
+import sqlite3
+import hashlib
 
 # Full paths of the image cache folder and database
 # - The image cache directory is a subdirectory of the specified parent directory.
@@ -59,15 +61,15 @@ def get_apod_date():
         try :
             apod_date = date.fromisoformat(value)
             if apod_date > date_today:
-                print("Error") # TODO: Proper Error Message
+                print("Please enter a date that is more recent.") # TODO: Proper Error Message
                 sys.exit(1)
             elif apod_date < date.fromisoformat("1995-06-16"):
-                print("Error") # TODO: Proper Error Message
+                print("Please enter a date that is before 1995-06-16.") # TODO: Proper Error Message
                 sys.exit(1)
             else:
                 return apod_date
         except:
-            print("Error") # TODO: Proper Error Message
+            print("Please enter a valid date.") # TODO: Proper Error Message
             sys.exit(1)
     else:
         return date_today
@@ -79,7 +81,13 @@ def init_apod_cache():
     - Creating the image cache database if it does not already exist.
     """
     # TODO: Create the image cache directory if it does not already exist
+    APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
+    APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
+
+
     # TODO: Create the DB if it does not already exist
+
+
     return
 
 def add_apod_to_cache(apod_date):
@@ -127,6 +135,22 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         int: The ID of the newly inserted APOD record, if successful. Zero, if unsuccessful       
     """
     # TODO: Complete function body
+    post_params = {'api_dev_key': APOD_DESKTOP_KEY,
+                   'api_option': 'paste' ,
+                   'api_paste_code': explanation,
+                   'api_paste_name': title,
+                   'api_paste_private' : 0 if listed else 1,
+                   'api_paste_expire_date': expiration}
+    
+    resp_msg =requests.post(, data= post_params)
+    #check is paste was created successful
+    if resp_msg.status_code == requests.codes.ok:
+        print("Success!")
+    else:
+        print(f"Failure in creating paste!")
+        print(f'Status code: {resp_msg.status_code} ({resp_msg.reason})')
+
+    return resp_msg.text
     return 0
 
 def get_apod_id_from_db(image_sha256):
@@ -141,7 +165,10 @@ def get_apod_id_from_db(image_sha256):
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
     # TODO: Complete function body
-    return 0
+    image_hash =hashlib.sha256(image_sha256).hexdigest()
+    print(image_hash) 
+    if image_sha256 == image_hash:
+        return 0
 
 def determine_apod_file_path(image_title, image_url):
     """Determines the path at which a newly downloaded APOD image must be 
@@ -170,6 +197,16 @@ def determine_apod_file_path(image_title, image_url):
     """
     # TODO: Complete function body
     # Hint: Use regex and/or str class methods to determine the filename.
+    url = f"https://apod.nasa.gov/apod/image/2408/Rhemann799_109P_24_11_92.jpg"
+    image_tile = "Periodic Comet Swift-Tuttle"
+    image_path = r'C:\temp\APOD\"Periodic Comet Swift-Tuttle.jpg'
+    resp_msg = requests.get(file_url)
+
+    if resp_msg.status_code == requests.codes.ok:
+        file_content =resp_msg.content
+    
+        
+    return file_content
     return
 
 def get_apod_info(image_id):
@@ -183,10 +220,48 @@ def get_apod_info(image_id):
         dict: Dictionary of APOD information
     """
     # TODO: Query DB for image info
+    con = sqlite3.connect('image_cache.db')
+    cur = con.cursor
+    image_query = """
+    CREATE TABLE IS NOT EXIST IMAGE
+    (
+        id          INTEGER PRIMARY KEY,
+        title       TEXT NOT NULL,
+        explanation TEXT NOT NULL,
+        file_path   TEXT NOT NULL,
+        created_at DATETIME NOT NULL,
+        updated_at DATETIME NOT NULL
+    );
+"""
+    cur.excute(image_query)
+    con.commit()
+    con.close()
+
+    #con = sqlite3.connect('social_network.db')
+    #cur = con.cursor()
+
+    #add_person_query = """
+        INSERT INTO people
+        (
+            name,
+            email,
+            address,
+            city,
+            province,
+            bio,
+            age,
+            created_at,
+            updated_at
+        )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+
+
     # TODO: Put information into a dictionary
     apod_info = {
-        #'title': , 
-        #'explanation': ,
+        'title': "Periodic Comet Swift-Tuttle" , 
+        'explanation': "A Halley-type comet with an orbital period of about 133 years, Comet 109P/Swift-Tuttle is recognized as the parent of the annual Perseid Meteor Shower. The comet's last visit to the inner Solar System was in 1992. Then, it did not become easily visible to the naked eye, but it did become bright enough to see from most locations with binoculars and small telescopes. This stunning color image of Swift-Tuttle's greenish coma, long ion tail and dust tail was recorded using film on November 24, 1992. That was about 16 days after the large periodic comet's closest approach to Earth. Comet Swift-Tuttle is expected to next make an impressive appearance in night skies in 2126. Meanwhile, dusty cometary debris 
+                        'left along the orbit of Swift-Tuttle will continue to be swept up creating planet Earth''s best-known July and August meteor shower.",
         'file_path': 'TBD',
     }
     return apod_info
