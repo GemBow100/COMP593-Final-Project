@@ -1,4 +1,5 @@
 """ 
+Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
 COMP 593 - Final Project
 
 Description: 
@@ -17,6 +18,7 @@ import image_lib
 import sys
 import sqlite3
 import hashlib
+import requests
 
 # Full paths of the image cache folder and database
 # - The image cache directory is a subdirectory of the specified parent directory.
@@ -24,6 +26,8 @@ import hashlib
 script_dir = os.path.dirname(os.path.abspath(__file__))
 image_cache_dir = os.path.join(script_dir, 'images')
 image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
+APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
+APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
 
 def main():
     ## DO NOT CHANGE THIS FUNCTION ##
@@ -80,12 +84,29 @@ def init_apod_cache():
     - Creating the image cache directory if it does not already exist,
     - Creating the image cache database if it does not already exist.
     """
-    # TODO: Create the image cache directory if it does not already exist
-    APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
-    APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
+    # TODO: Create the image cache directory if it does not already 
+    if not os.path.isfile(image_cache_dir):
+        os.makedirs(image_cache_dir)
 
-
-    # TODO: Create the DB if it does not already exist
+    # TODO: Create the DB if it does not already exist/fix
+    if not os.path.isfile(image_cache_db):
+    
+        con = sqlite3.connect('image_cache.db')
+        cur = con.cursor
+        image_query = """
+    CREATE TABLE IS NOT EXIST IMAGE
+    (
+        id          INTEGER PRIMARY KEY,
+        title       TEXT NOT NULL,
+        explanation TEXT NOT NULL,
+        file_path   TEXT NOT NULL,
+        created_at DATETIME NOT NULL,
+        updated_at DATETIME NOT NULL
+    );
+"""
+    cur.excute(image_query)
+    con.commit()
+    con.close()
 
 
     return
@@ -106,14 +127,15 @@ def add_apod_to_cache(apod_date):
     """
     print("APOD date:", apod_date.isoformat())
     # TODO: Download the APOD information from the NASA API
-    # Hint: Use a function from apod_api.py 
+    # Hint: Use a function from apod_api.py
+    apod_api = get_apod_info(apod_date)
 
     # TODO: Download the APOD image
     # Hint: Use a function from image_lib.py 
-
+    apod_image = image_lib(apod_api)
     # TODO: Check whether the APOD already exists in the image cache
     # Hint: Use the get_apod_id_from_db() function below
-
+    image_lib.download_image(apod_api)
     # TODO: Save the APOD file to the image cache directory
     # Hint: Use the determine_apod_file_path() function below to determine the image file path
     # Hint: Use a function from image_lib.py to save the image file

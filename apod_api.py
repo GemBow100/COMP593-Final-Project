@@ -1,4 +1,5 @@
 '''
+Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
 Library for interacting with NASA's Astronomy Picture of the Day API.
 '''
 

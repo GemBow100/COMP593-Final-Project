@@ -1,4 +1,6 @@
 '''
+Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
+
 Library of useful functions for working with images.
 '''
 def main():
