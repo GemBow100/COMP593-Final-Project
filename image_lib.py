@@ -3,6 +3,12 @@ Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
 
 Library of useful functions for working with images.
 '''
+import requests
+import ctypes
+import apod_api
+import apod_desktop
+import os
+from PIL import Image
 def main():
     # TODO: Add code to test the functions in this module 
     image_data = download_image('https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg')
@@ -29,12 +35,16 @@ def download_image(image_url):
 
     # Check if the image was retrieved successfully
     if resp_msg.status_code == requests.codes.ok:
+        binData = resp_msg.content
+        with Image.open(".jpg") as img:
+            size = img.size
+            scale_image(size)
         print('success')
-        return resp_msg.content
+        return binData
     else:
         print('failure')
         print(f'Response code: {resp_msg.status_code} ({resp_msg.reason})') 
-    return
+    return None
 
 def save_image_file(image_data, image_path):
     """Saves image data as a file on disk.
@@ -72,17 +82,19 @@ def set_desktop_background_image(image_path):
     # TODO: Complete function body
     print(f"Setting desktop to {image_path}...", end='')
     SPI_SETDESKWALLPAPER = 20
+    image_path = os.path.abspath(image_path)
     try:
         if ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, image_path, 3):
+            with Image.open(image_path) as img:
+                size =img.size
+                scale_image(size)
             print("success")
             return True
-        else:
-            print("failure")
     except:
         print("failure")
-    return False
+        return False
 
-    return
+    
 
 def scale_image(image_size, max_size=(800, 600)):
     """Calculates the dimensions of an image scaled to a maximum width

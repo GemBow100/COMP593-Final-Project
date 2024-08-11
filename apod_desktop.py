@@ -1,5 +1,6 @@
 """ 
 Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
+
 COMP 593 - Final Project
 
 Description: 
@@ -19,6 +20,8 @@ import sys
 import sqlite3
 import hashlib
 import requests
+import re
+import apod_api
 
 # Full paths of the image cache folder and database
 # - The image cache directory is a subdirectory of the specified parent directory.
@@ -84,12 +87,18 @@ def init_apod_cache():
     - Creating the image cache directory if it does not already exist,
     - Creating the image cache database if it does not already exist.
     """
-    # TODO: Create the image cache directory if it does not already 
+    # TODO: Create the image cache directory if it does not already
+    print(f"Image cache directory: {image_cache_dir}")
     if not os.path.isfile(image_cache_dir):
         os.makedirs(image_cache_dir)
+        print(f"Image cache was created.")
+    else:
+        print(f"Image cache already exists.")
 
-    # TODO: Create the DB if it does not already exist/fix
+    # TODO: Create the DB if it does not already exist
+    print(f"Image cache database: {image_cache_db}")
     if not os.path.isfile(image_cache_db):
+        print("Image cache database was created.")
     
         con = sqlite3.connect('image_cache.db')
         cur = con.cursor
@@ -100,14 +109,14 @@ def init_apod_cache():
         title       TEXT NOT NULL,
         explanation TEXT NOT NULL,
         file_path   TEXT NOT NULL,
-        created_at DATETIME NOT NULL,
-        updated_at DATETIME NOT NULL
+        Sha256     TEXT NOT NULL,
     );
 """
-    cur.excute(image_query)
-    con.commit()
-    con.close()
-
+        cur.excute(image_query)
+        con.commit()
+        con.close()
+    else:
+        print(f"Image cache database already exist.")
 
     return
 
@@ -128,23 +137,36 @@ def add_apod_to_cache(apod_date):
     print("APOD date:", apod_date.isoformat())
     # TODO: Download the APOD information from the NASA API
     # Hint: Use a function from apod_api.py
-    apod_api = get_apod_info(apod_date)
+    apod_info = apod_api.get_apod_info(apod_date)
 
     # TODO: Download the APOD image
     # Hint: Use a function from image_lib.py 
-    apod_image = image_lib(apod_api)
+    apod_image = image_lib.download_image(apod_api.get_apod_image_url(apod_info))
+    respmsg = requests.get(apod_api.get_apod_image_url(apod_info))
+
+    if respmsg.status_code== requests.codes.ok:
+        content= respmsg.content
+
+        hashvalue = hashlib.sha256(content).hexdigest()
+
     # TODO: Check whether the APOD already exists in the image cache
     # Hint: Use the get_apod_id_from_db() function below
-    image_lib.download_image(apod_api)
+    apod_id = get_apod_id_from_db(hashvalue)
     # TODO: Save the APOD file to the image cache directory
     # Hint: Use the determine_apod_file_path() function below to determine the image file path
     # Hint: Use a function from image_lib.py to save the image file
+    if apod_id == 0:
+        image_path = determine_apod_file_path(apod_info['image_title'],apod_info['image_url'])
 
+        apod_id = add_apod_to_db(apod_info ['title'],apod_info['explanation'], image_path, hashvalue)
+
+        image_lib.save_image_file(apod_image,image_path)
     # TODO: Add the APOD information to the DB
     # Hint: Use the add_apod_to_db() function below
-    return 0
+    add_apod_to_cache(apod_date)
+    return apod_id
 
-def add_apod_to_db(title, explanation, file_path, sha256):
+def add_apod_to_db(title, explanation, file_path, sha256):#????
     """Adds specified APOD information to the image cache DB.
      
     Args:
@@ -157,23 +179,26 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         int: The ID of the newly inserted APOD record, if successful. Zero, if unsuccessful       
     """
     # TODO: Complete function body
-    post_params = {'api_dev_key': APOD_DESKTOP_KEY,
-                   'api_option': 'paste' ,
-                   'api_paste_code': explanation,
-                   'api_paste_name': title,
-                   'api_paste_private' : 0 if listed else 1,
-                   'api_paste_expire_date': expiration}
-    
-    resp_msg =requests.post(, data= post_params)
-    #check is paste was created successful
-    if resp_msg.status_code == requests.codes.ok:
-        print("Success!")
-    else:
-        print(f"Failure in creating paste!")
-        print(f'Status code: {resp_msg.status_code} ({resp_msg.reason})')
 
-    return resp_msg.text
+    con = sqlite3.connect(image_cache_db)
+    cur= con.cursor()
+
+    apod_image_query= """
+        INSERT INTO apod
+        (      
+            title,
+            explanation,
+            file_path,
+            Sha256,
+        )
+            VALUES (?,?,?,?);
+        """
+    cur.execute(apod_image_query)
+    con.commit()
+    con.close()
+
     return 0
+    
 
 def get_apod_id_from_db(image_sha256):
     """Gets the record ID of the APOD in the cache having a specified SHA-256 hash value
@@ -187,10 +212,17 @@ def get_apod_id_from_db(image_sha256):
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
     # TODO: Complete function body
-    image_hash =hashlib.sha256(image_sha256).hexdigest()
-    print(image_hash) 
-    if image_sha256 == image_hash:
+    con = sqlite3.connect(image_cache_db)
+    cur =con.cursor()
+    instruction =(f" SELECT id FROM apod WHERE sha256 = ?", (image_sha256))
+    cur.execute(instruction)
+    apod_id =cur.fetchone()
+    con.close
+    if apod_id is not None:
+        return apod_id[0]
+    else:
         return 0
+    
 
 def determine_apod_file_path(image_title, image_url):
     """Determines the path at which a newly downloaded APOD image must be 
@@ -219,17 +251,21 @@ def determine_apod_file_path(image_title, image_url):
     """
     # TODO: Complete function body
     # Hint: Use regex and/or str class methods to determine the filename.
-    url = f"https://apod.nasa.gov/apod/image/2408/Rhemann799_109P_24_11_92.jpg"
-    image_tile = "Periodic Comet Swift-Tuttle"
-    image_path = r'C:\temp\APOD\"Periodic Comet Swift-Tuttle.jpg'
-    resp_msg = requests.get(file_url)
+    image_file_regex = r"[^a-zA-Z0-9\s]"
 
-    if resp_msg.status_code == requests.codes.ok:
-        file_content =resp_msg.content
+    #strip down the file name to and extension
+    file_extension = image_url.split('.')[-1]
+
+    file_name =image_title.strip.replace(" "," _")
+
+    file_name = re.sub(image_file_regex,"",file_name)
+
+    file_path = os.path.join(image_cache_dir, f" {file_name}. {file_extension}") 
     
-        
-    return file_content
-    return
+    return file_path
+          
+   
+
 
 def get_apod_info(image_id):
     """Gets the title, explanation, and full path of the APOD having a specified
@@ -243,48 +279,29 @@ def get_apod_info(image_id):
     """
     # TODO: Query DB for image info
     con = sqlite3.connect('image_cache.db')
-    cur = con.cursor
-    image_query = """
+    cur = con.cursor()
+    get_apod_info_query = {
+        'title': 'Title',
+        'explanation' : 'Explanation',
+        'file_path': 'File Path',
+        'sha256': 'SHA-256'
+    }
+    get_apod_info_query = """
     CREATE TABLE IS NOT EXIST IMAGE
     (
         id          INTEGER PRIMARY KEY,
         title       TEXT NOT NULL,
         explanation TEXT NOT NULL,
         file_path   TEXT NOT NULL,
-        created_at DATETIME NOT NULL,
-        updated_at DATETIME NOT NULL
+        sha256      TEXT NOT NULL,
     );
 """
-    cur.excute(image_query)
-    con.commit()
+    cur.excute(get_apod_info_query)
+
+    apod_info =cur.fetchall()
+    
     con.close()
 
-    #con = sqlite3.connect('social_network.db')
-    #cur = con.cursor()
-
-    #add_person_query = """
-        INSERT INTO people
-        (
-            name,
-            email,
-            address,
-            city,
-            province,
-            bio,
-            age,
-            created_at,
-            updated_at
-        )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """
-
-
-    # TODO: Put information into a dictionary
-    apod_info = {
-        'title': "Periodic Comet Swift-Tuttle" , 
-        'explanation': 'A Halley-type comet with an orbital period of about 133 years, Comet 109P/Swift-Tuttle is recognized as the parent of the annual Perseid Meteor Shower. The comet's last visit to the inner Solar System was in 1992. Then, it did not become easily visible to the naked eye, but it did become bright enough to see from most locations with binoculars and small telescopes. This stunning color image of Swift-Tuttle's greenish coma, long ion tail and dust tail was recorded using film on November 24, 1992. That was about 16 days after the large periodic comet's closest approach to Earth. Comet Swift-Tuttle is expected to next make an impressive appearance in night skies in 2126. Meanwhile, dusty cometary debris left along the orbit of Swift-Tuttle will continue to be swept up creating planet Earth''s best-known July and August meteor shower.' ,
-        'file_path': 'TBD',
-    }
     return apod_info
 
 def get_all_apod_titles():
@@ -295,7 +312,13 @@ def get_all_apod_titles():
     """
     # TODO: Complete function body
     # NOTE: This function is only needed to support the APOD viewer GUI
-    return
+    con = sqlite3.connect(image_cache_db)
+    cur = con.cursor()
+
+    cur.execute(f"SELECT title FROM apod")
+
+    titles =cur.fetchall
+    return titles
 
 if __name__ == '__main__':
     main()

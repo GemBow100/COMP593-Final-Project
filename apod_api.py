@@ -3,9 +3,20 @@ Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
 Library for interacting with NASA's Astronomy Picture of the Day API.
 '''
 
+import requests
+import json 
+import apod_desktop
+
+APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
+
+APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
 def main():
     # TODO: Add code to test the functions in this module
-    return
+
+    date = apod_desktop.get_apod_date()
+
+    get_apod_info(date)
+    
 
 def get_apod_info(apod_date):
     """Gets information from the NASA API for the Astronomy 
@@ -20,7 +31,22 @@ def get_apod_info(apod_date):
     # TODO: Complete the function body
     # Hint: The APOD API uses query string parameters: https://requests.readthedocs.io/en/latest/user/quickstart/#passing-parameters-in-urls
     # Hint: Set the 'thumbs' parameter to True so the info returned for video APODs will include URL of the video thumbnail image 
-    return
+
+    apoddate = {'date': apod_date, 'thumbs': True, 'api_key': APOD_DESKTOP_KEY}
+
+    respmsg = requests.get(APOD_DESKTOP_URL, params=apoddate)
+
+    print(f"Recieving {apod_date} and information from NASA.", end = " ")
+
+    if respmsg.status_code == requests.codes.ok:
+        print(f"Successful!")
+
+        dict_apod_info =json.loads(respmsg.content)
+
+        title = dict_apod_info['title'].title()
+
+        print(f"Title : {title}")
+    return dict_apod_info
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
@@ -36,7 +62,14 @@ def get_apod_image_url(apod_info_dict):
     """
     # TODO: Complete the function body
     # Hint: The APOD info dictionary includes a key named 'media_type' that indicates whether the APOD is an image or video
-    return
+    date = apod_desktop.get_apod_date()
+    apod_info_dict = get_apod_info(date)
+
+    if apod_info_dict['media_type'] == 'image':
+        return apod_info_dict ['hdurl']
+    else:
+        return apod_info_dict['thumbnail_url']
+    
 
 if __name__ == '__main__':
     main()
