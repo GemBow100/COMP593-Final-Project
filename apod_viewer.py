@@ -34,8 +34,8 @@ frm.rowconfigure(0, weight=1)
 frm.grid(sticky= NSEW)
 
 
-image_path= os.path.join(image_cache_dir, 'NASA_Logo.png')
-Photo= ImageTk.PhotoImage(Image.open(image_path).resize((500,500)))
+
+Photo= ImageTk.PhotoImage(Image.open("NASA_Logo.png").resize((500,500)))
 
 lbl_image_backg=ttk.Label(frm, image = Photo)
 lbl_image_backg.grid(row=0,column=1, padx=(0,10), pady=(10,20),sticky= N)
@@ -78,7 +78,7 @@ enter_dates = DateEntry(frm_more_images, maxdate=v_today, date_pattern=date_pat)
 
 enter_dates.insert(0,"")
 enter_dates.grid(row=1, column=4)
-print (f"Fetch Dates:{enter_dates.get()}")
+print (f" Get Dates:{enter_dates.get()}")
 
     
 enter_downloadI = ttk.Button(frm_more_images, text="Download Image")

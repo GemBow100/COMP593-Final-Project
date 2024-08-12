@@ -169,11 +169,13 @@ def add_apod_to_cache(apod_date):
     # TODO: Check whether the APOD already exists in the image cache
     # Hint: Use the get_apod_id_from_db() function below
     apod_id = get_apod_id_from_db(hashvalue)
+    
+
     # TODO: Save the APOD file to the image cache directory
     # Hint: Use the determine_apod_file_path() function below to determine the image file path
     # Hint: Use a function from image_lib.py to save the image file
     if apod_id == 0:
-        image_path = determine_apod_file_path(apod_info['title'],apod_info['url'])
+        image_path = determine_apod_file_path(apod_info['file_path'],apod_info['file_path'])
         apod_id = add_apod_to_db(apod_info ['title'],apod_info['explanation'], image_path, hashvalue)
         image_lib.save_image_file(apod_image,image_path)
     # TODO: Add the APOD information to the DB
@@ -186,7 +188,6 @@ def add_apod_to_cache(apod_date):
         return apod_id
     return 0
     
-
 
 
 def add_apod_to_db(title, explanation, file_path, sha256):
