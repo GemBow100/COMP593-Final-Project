@@ -6,12 +6,11 @@ Library for interacting with NASA's Astronomy Picture of the Day API.
 import requests
 import json 
 import apod_desktop
-import hashlib
 import re
 
 Api_key = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
 
-APOD_URL = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5'
+APOD_URL = 'https://api.nasa.gov/planetary/apod'
 def main():
     # TODO: Add code to test the functions in this module
 
@@ -19,15 +18,15 @@ def main():
 
     get_apod_info(date)
 
-def cleanTitle(title):
+#def cleanTitle(title):
     # {REQ-18, part 1}
-    v_aux=title.strip()           # Leading and trailing spaces are removed
-    v_aux2=v_aux.replace(' ', '_')  # Inner spaces are replaced by '_'
+    #v_aux=title.strip()           # Leading and trailing spaces are removed
+    #v_aux2=v_aux.replace(' ', '_')  # Inner spaces are replaced by '_'
     # Use a regular expression, obtein lettters, numbers and '_'
-    v_titleaux = re.findall(r'[a-zA-Z_0-9]+', v_aux2)   
-    v_Title=""
-    for titles in v_titleaux:
-        v_Title += titles
+    #v_titleaux = re.findall(r'[a-zA-Z_0-9]+', v_aux2)   
+    #v_Title=""
+    #for titles in v_titleaux:
+       # v_Title += titles
     
 
 def get_apod_info(apod_date):
@@ -81,10 +80,10 @@ def get_apod_image_url(apod_info_dict):
     # Hint: The APOD info dictionary includes a key named 'media_type' that indicates whether the APOD is an image or video
     date = apod_desktop.get_apod_date()  
     apod_info_dict = get_apod_info(date)
-    # If it is an image, get the URL of the high definition image
+    
     if apod_info_dict['media_type'] == 'image':
         return apod_info_dict['hdurl']    
-    # If it is a video, get the URL of the video thumbnail
+    
     else:
         return apod_info_dict['thumbnail_url']
 

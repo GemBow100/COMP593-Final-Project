@@ -13,8 +13,8 @@ def main():
     # TODO: Add code to test the functions in this module 
     date = apod_desktop.get_apod_date()
     info = apod_api.get_apod_info(date)
-    APOD_DESKTOP_URL = apod_api.get_apod_image_url(info)
-    bind = download_image(APOD_DESKTOP_URL)
+    APOD_URL = apod_api.get_apod_image_url(info)
+    bind = download_image(APOD_URL)
     save_image_file(bind,"NASA_Logo.png")
     set_desktop_background_image("NASA_logo.png")
     

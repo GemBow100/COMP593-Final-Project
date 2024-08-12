@@ -65,12 +65,13 @@ def get_apod_date():
     """
     date_today = date.today()
     if len(sys.argv) >= 2:
-        value = sys.argv[1]
+        apod_date = sys.argv[1]
         try :
-            apod_date = date.fromisoformat(value)
+            apod_date = date.fromisoformat(apod_date)
             if apod_date > date_today:
                 print("Please enter a date that is more recent.") # TODO: Proper Error Message
                 sys.exit(1)
+                
             elif apod_date < date.fromisoformat("1995-06-16"):
                 print("Please enter a date that is before 1995-06-16.") # TODO: Proper Error Message
                 sys.exit(1)
@@ -90,35 +91,50 @@ def init_apod_cache():
     """
     # TODO: Create the image cache directory if it does not already
     print(f"Image cache directory: {image_cache_dir}")
-    if not os.path.exists(image_cache_dir):
-        os.makedirs(image_cache_dir)
-        print(f"Image cache was created.")
+   # if not os.path.exists(image_cache_dir):
+       #os.makedirs(image_cache_dir)
+        #print(f"Image cache was created.")
+    #else:
+        #print(f"Image cache already exists.")
+     # {REQ-14} {REQ-15} Create directory
+    if os.path.isdir(image_cache_dir):
+        print(f"image_cache_directory:{image_cache_dir} already exists.")       
+    else:           
+        print(f"Images cache directory:{image_cache_dir} created.")
+        os.mkdir(image_cache_dir)
+
+    # Database
+    if os.path.isfile(image_cache_db):
+        print(f"Images cache DB:{image_cache_db}")
+        print ("Image cache DB already exists.")
     else:
-        print(f"Image cache already exists.")
+        # {REQ-11}
+        print(f"image_cache_db:{image_cache_db}")
         
 
     # TODO: Create the DB if it does not already exist
-    print(f"Image cache database: {image_cache_db}")
-    if not os.path.isfile(image_cache_db):
-        print(f"Images cache database was created")
+    #print(f"Image cache database: {image_cache_db}")
+    #if not os.path.isfile(image_cache_db):
+       #print(f"Images cache database was created")
     
     
         con = sqlite3.connect('image_cache.db')
         cur = con.cursor()
         image_query = """
-            CREATE TABLE IF NOT EXISTS Image
-            (
-                id          INTEGER PRIMARY KEY,
-                title       TEXT NOT NULL,
-                explanation TEXT NOT NULL,
-                file_path   TEXT NOT NULL,
-                Sha256     TEXT NOT NULL
-            );
-            """
+        CREATE TABLE IF NOT EXISTS Image
+        (
+            id          INTEGER PRIMARY KEY,
+            title       TEXT NOT NULL,
+            explanation TEXT NOT NULL,
+            file_path   TEXT NOT NULL,
+            Sha256     TEXT NOT NULL
+        );
+        """
         cur.execute(image_query)
+        con.commit()
         con.close()
-    else:
-        print(f"Image cache database already exists.")
+    #else:
+        #print(f"Image cache database already exists.")
     return
 
 def add_apod_to_cache(apod_date):
@@ -145,7 +161,7 @@ def add_apod_to_cache(apod_date):
     apod_image = image_lib.download_image(apod_api.get_apod_image_url(apod_info))
     respmsg = requests.get(apod_api.get_apod_image_url(apod_info))
 
-    if respmsg.status_code== requests.codes.ok:
+    if respmsg.status_code == requests.codes.ok:
         content= respmsg.content
 
         hashvalue = hashlib.sha256(content).hexdigest()
@@ -165,6 +181,7 @@ def add_apod_to_cache(apod_date):
     
         add_apod_to_cache(apod_date)
         return apod_id
+    
     elif apod_id !=0:
         return apod_id
     return 0
@@ -185,6 +202,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         int: The ID of the newly inserted APOD record, if successful. Zero, if unsuccessful       
     """
     # TODO: Complete function body
+    
 
     con = sqlite3.connect(image_cache_db)
     cur= con.cursor()
@@ -198,9 +216,20 @@ def add_apod_to_db(title, explanation, file_path, sha256):
             Sha256,
         )
             VALUES (?,?,?,?);
-        """
-    title, explanation, file_path, sha256
-    cur.execute(apod_image_query)
+    """
+    new_image = (
+                title,
+                explanation,
+                file_path,
+                sha256
+            )
+    
+    cur.execute(apod_image_query, new_image)
+
+    cur.execute('SELECT * FROM Imagecache')
+
+    all_image = cur.fetchall()
+    print(all_image)
     con.commit()
     con.close()
 
@@ -219,11 +248,15 @@ def get_apod_id_from_db(image_sha256):
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
     # TODO: Complete function body
+    
+    #resp_msg = requests.get(image_sha256)
+    
     con = sqlite3.connect(image_cache_db)
     cur =con.cursor()
-    cur.execute("SELECT id FROM apod WHERE sha256 = ?", (image_sha256))
+    cur.execute("SELECT id FROM apod WHERE sha256 = ?", (image_sha256,))
+
+    apod_id = cur.fetchone()
     
-    apod_id =cur.fetchone()
     con.close()
     if apod_id is not None:
         return apod_id[0]
@@ -287,14 +320,14 @@ def get_apod_info(image_id):
     # TODO: Query DB for image info
     con = sqlite3.connect('image_cache.db')
     cur = con.cursor()
-    get_apod_info_query = {
+    """get_apod_info_query = {
         'title': 'Title',
         'explanation' : 'Explanation',
         'file_path': 'File Path',
         'sha256': 'SHA-256'
-    }
+    }"""
     get_apod_info_query = """
-    CREATE TABLE IS NOT EXIST IMAGE
+    CREATE TABLE apod
     (
         id          INTEGER PRIMARY KEY,
         title       TEXT NOT NULL,
@@ -302,7 +335,7 @@ def get_apod_info(image_id):
         file_path   TEXT NOT NULL,
         sha256      TEXT NOT NULL,
     );
-"""
+    """
     cur.excute(get_apod_info_query)
 
     apod_info =cur.fetchall()
