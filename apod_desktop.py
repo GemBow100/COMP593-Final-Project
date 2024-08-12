@@ -114,7 +114,7 @@ def init_apod_cache():
         Sha256     TEXT NOT NULL,
     );
 """
-        cur.excute(image_query)
+        cur.execute(image_query)
         con.commit()
         con.close()
     return
