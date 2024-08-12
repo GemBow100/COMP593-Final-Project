@@ -9,9 +9,9 @@ import apod_desktop
 import hashlib
 import re
 
-APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
+Api_key = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
 
-APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
+APOD_URL = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5'
 def main():
     # TODO: Add code to test the functions in this module
 
@@ -44,9 +44,9 @@ def get_apod_info(apod_date):
     # Hint: The APOD API uses query string parameters: https://requests.readthedocs.io/en/latest/user/quickstart/#passing-parameters-in-urls
     # Hint: Set the 'thumbs' parameter to True so the info returned for video APODs will include URL of the video thumbnail image 
 
-    params = {'date': apod_date, 'thumbs': True, 'api_key': APOD_DESKTOP_KEY}
+    params = {'date': apod_date, 'thumbs': True, 'api_key': Api_key}
 
-    respmsg = requests.get(APOD_DESKTOP_URL, params=params)
+    respmsg = requests.get(APOD_URL, params=params)
 
     print(f"Recieving date {apod_date} and information from NASA.", end = " ")
 
