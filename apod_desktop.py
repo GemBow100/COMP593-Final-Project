@@ -88,11 +88,11 @@ def init_apod_cache():
     """
     # TODO: Create the image cache directory if it does not already
     print(f"Image cache directory: {image_cache_dir}")
-    if not os.path.isfile(image_cache_dir):
-        os.makedirs(image_cache_dir)
-        print(f"Image cache was created.")
+    if os.path.isfile(image_cache_dir):
+        print(f"Image cache already exists.")
     else:
         print(f"Image cache already exists.")
+        os.makedirs(image_cache_dir)
 
     # TODO: Create the DB if it does not already exist
     print(f"Image cache database: {image_cache_db}")
@@ -165,7 +165,7 @@ def add_apod_to_cache(apod_date):
     add_apod_to_cache(apod_date)
     return apod_id
 
-def add_apod_to_db(title, explanation, file_path, sha256):#????
+def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
      
     Args:
@@ -183,7 +183,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):#????
     cur= con.cursor()
 
     apod_image_query= """
-        INSERT INTO apod
+        INSERT INTO Images Cache
         (      
             title,
             explanation,
@@ -192,6 +192,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):#????
         )
             VALUES (?,?,?,?);
         """
+    title, explanation, file_path, sha256
     cur.execute(apod_image_query)
     con.commit()
     con.close()
