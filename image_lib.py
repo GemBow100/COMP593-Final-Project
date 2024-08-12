@@ -15,8 +15,8 @@ def main():
     info = apod_api.get_apod_info(date)
     url = apod_api.get_apod_image_url(info)
     bind = download_image(url)
-    save_image_file(bind,".jpg")
-    set_desktop_background_image("*.jpg")
+    save_image_file(bind,"NASA_Logo.png")
+    set_desktop_background_image("NASA_logo.png")
     
 
 def download_image(image_url):
@@ -37,7 +37,7 @@ def download_image(image_url):
     # Check if the image was retrieved successfully
     if resp_msg.status_code == requests.codes.ok:
         binData = resp_msg.content
-        with Image.open(".jpg") as img:
+        with Image.open("NASA_logo.png") as img:
             size = img.size
             scale_image(size)
         print('success')
