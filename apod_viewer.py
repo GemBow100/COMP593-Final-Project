@@ -38,7 +38,7 @@ frm.grid(sticky= NSEW)
 Photo= ImageTk.PhotoImage(Image.open("NASA_Logo.png").resize((500,500)))
 
 lbl_image_backg=ttk.Label(frm, image = Photo)
-lbl_image_backg.grid(row=0,column=1, padx=(0,10), pady=(10,20),sticky= N)
+lbl_image_backg.grid(row=0,column=3, columnspan=2, padx=(250), pady=(10,20),sticky= N)
 #frm_image_background = ttk.Frame(root)
 #frm_image_background.grid(row=0, column=0)
 
