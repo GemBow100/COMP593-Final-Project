@@ -1,3 +1,10 @@
+'''
+Team: Joelle Waugh, Ricardo Rudin, Manual Manrike Lopez, Sadia Shoily
+
+Description: Created a Gui to View  the Nasa image.
+
+'''
+
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
@@ -16,7 +23,7 @@ image_cache_dir = os.path.join(script_dir, 'images')
 
 # TODO: Create the GUI
 root = Tk()
-root.geometry('1000x700')
+root.geometry('900x700')
 root.minsize(600,600)
 root.columnconfigure(0,weight=1)
 root.rowconfigure(0, weight=1)

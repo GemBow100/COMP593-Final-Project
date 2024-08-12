@@ -1,5 +1,5 @@
 """ 
-Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
+Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, (Sadia Shoily)
 
 COMP 593 - Final Project
 
@@ -91,12 +91,7 @@ def init_apod_cache():
     """
     # TODO: Create the image cache directory if it does not already
     print(f"Image cache directory: {image_cache_dir}")
-   # if not os.path.exists(image_cache_dir):
-       #os.makedirs(image_cache_dir)
-        #print(f"Image cache was created.")
-    #else:
-        #print(f"Image cache already exists.")
-     # {REQ-14} {REQ-15} Create directory
+        # {REQ-14} {REQ-15} Create directory
     if os.path.isdir(image_cache_dir):
         print(f"image_cache_directory:{image_cache_dir} already exists.")       
     else:           
@@ -113,11 +108,7 @@ def init_apod_cache():
         
 
     # TODO: Create the DB if it does not already exist
-    #print(f"Image cache database: {image_cache_db}")
-    #if not os.path.isfile(image_cache_db):
-       #print(f"Images cache database was created")
-    
-    
+     
         con = sqlite3.connect('image_cache.db')
         cur = con.cursor()
         image_query = """
