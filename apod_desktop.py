@@ -30,7 +30,7 @@ import apod_api
 script_dir = os.path.dirname(os.path.abspath(__file__))
 image_cache_dir = os.path.join(script_dir, 'images')
 image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
-image_url = 'https://api.nasa.gov/planetary/apod'
+
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
 
     # Add the APOD for the specified date to the cache
     apod_id = add_apod_to_cache(apod_date)
-    print(f"In main ={apod_id}")
+    print(apod_id)
     # Get the information for the APOD from the DB
     apod_info = get_apod_info(apod_id)
 
@@ -221,10 +221,10 @@ def get_apod_id_from_db(image_sha256):
     # TODO: Complete function body
     con = sqlite3.connect(image_cache_db)
     cur =con.cursor()
-    cur.execute(f" SELECT id FROM apod WHERE sha256 = ?", (image_sha256))
+    cur.execute("SELECT id FROM apod WHERE sha256 = ?", (image_sha256))
     
     apod_id =cur.fetchone()
-    con.close
+    con.close()
     if apod_id is not None:
         return apod_id[0]
     else:
@@ -267,7 +267,7 @@ def determine_apod_file_path(image_title, image_url):
 
     file_name = re.sub(image_file_regex,"",file_name)
 
-    file_path = os.path.join(image_cache_dir, f" {file_name}. {file_extension}") 
+    file_path = os.path.join(image_cache_dir, f"{file_name}. {file_extension}") 
     
     return file_path
           

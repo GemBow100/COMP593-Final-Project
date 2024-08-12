@@ -48,7 +48,7 @@ def get_apod_info(apod_date):
 
     respmsg = requests.get(APOD_DESKTOP_URL, params=params)
 
-    print(f"Recieving {apod_date} and information from NASA.", end = " ")
+    print(f"Recieving date {apod_date} and information from NASA.", end = " ")
 
     if respmsg.status_code == requests.codes.ok:
         print(f"Successful!")
@@ -58,7 +58,12 @@ def get_apod_info(apod_date):
         title = dict_apod_info['title'].title()
 
         print(f"Title : {title}")
-    return dict_apod_info
+        return dict_apod_info
+    else:
+        print(f"Did not get info.")
+
+        print(f"{respmsg.status_code} {respmsg.reason} {respmsg.text}")
+    return None
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
