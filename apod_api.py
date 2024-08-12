@@ -8,9 +8,9 @@ import json
 import apod_desktop
 import re
 
-Api_key = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
-
 APOD_URL = 'https://api.nasa.gov/planetary/apod'
+
+Api_key = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
 def main():
     # TODO: Add code to test the functions in this module
 

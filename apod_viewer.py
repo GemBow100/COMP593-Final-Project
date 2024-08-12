@@ -3,11 +3,11 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from tkinter import messagebox
 from PIL import ImageTk, Image
-import tkinter as ttk
 import apod_desktop
 import datetime
 import os
 import ctypes
+import matplotlib.pyplot as plt
 # Initialize the image cache
 apod_desktop.init_apod_cache()
 
@@ -59,11 +59,13 @@ frm_more_images.grid(row=0, column=3, columnspan=2, pady=(10,20), padx=(0,10), s
 
 #TODO: Populate the user input frame with widgets
 lbl_cached = ttk.Label (frm_images, text="Select Image:")
-lbl_cached.grid(row=1, column=0, padx=(10,5), pady=5)
-
-enter_cached = ttk.Entry(frm_images)
-enter_cached.insert(0,"Select an image")
-enter_cached.grid(row=1, column=1, padx=10, pady= 20)
+lbl_cached.grid(row=1, column=0, padx=(10,5), pady=10)
+#x=[1,2,3,4,5]
+#y=[1,2,3,4,5]
+image_cache_dir = apod_desktop.init_apod_cache
+enter_cached = ttk.Combobox(frm_images, state="readonly")
+enter_cached.set("Select an image")
+enter_cached.grid(row=1, column=1, padx=20, pady= 10)
 
 
 enter_desktop = ttk.Button(frm_images, text="Set as Desktop")
@@ -82,9 +84,15 @@ print (f" Get Dates:{enter_dates.get()}")
 
     
 enter_downloadI = ttk.Button(frm_more_images, text="Download Image")
-#enter_downloadI.insert(0)
 enter_downloadI.grid(row=1, column=1, padx=10, pady= 10)
 
+'''def handle_os_sel(event):
+  lbl_cached = cbox_frmimages.get()
+  photo['file'] = os.path.join(, f'{selected_pokemon}.png')
+  lbl_image['image'] = photo
+  button_set['state'] = "enabled"
+
+cbox_poke.bind('<<ComboboxSelected>>', handle_os_sel)'''
 #lbl_image_backg = Label (frm_image_background, image=Photo)
 #lbl_image_backg.grid(row=7, column=1)
 
