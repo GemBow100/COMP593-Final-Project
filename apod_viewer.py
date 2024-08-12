@@ -38,7 +38,7 @@ image_path= os.path.join(image_cache_dir, 'NASA_Logo.png')
 Photo= ImageTk.PhotoImage(Image.open(image_path).resize((500,500)))
 
 lbl_image_backg=ttk.Label(frm, image = Photo)
-lbl_image_backg.grid(row=0, padx=(50,0), pady=(20),sticky= N)
+lbl_image_backg.grid(row=0,column=1, padx=(0,10), pady=(10,20),sticky= N)
 #frm_image_background = ttk.Frame(root)
 #frm_image_background.grid(row=0, column=0)
 
@@ -48,11 +48,11 @@ frm_input.grid(row=0, column=0, columnspan=2, pady=(20,10))
 
 frm_images = ttk.Frame(root)
 frm_images = ttk.LabelFrame(root, text="View Cached Image")
-frm_images.grid(row=0, column=0, columnspan=2, pady=(10,20), sticky=SW)
+frm_images.grid(row=0, column=0, columnspan=2, pady=(10,20),padx=(0,10), sticky=SW)
 
 frm_more_images = ttk.Frame(root)
 frm_more_images = ttk.LabelFrame(root, text="Get More Images")
-frm_more_images.grid(row=0, column=3, columnspan=2, pady=(10,20), sticky=SE)
+frm_more_images.grid(row=0, column=3, columnspan=2, pady=(10,20), padx=(0,10), sticky=SE)
 
 #frm_image_background = ttk.Frame(root)
 #frm_image_background.grid(row=0, column=0)
@@ -63,14 +63,13 @@ lbl_cached.grid(row=1, column=0, padx=(10,5), pady=5)
 
 enter_cached = ttk.Entry(frm_images)
 enter_cached.insert(0,"Select an image")
-enter_cached.grid(row=1, column=1)
+enter_cached.grid(row=1, column=1, padx=10, pady= 20)
 
 
-enter_desktop = ttk.Entry(frm_images)
-enter_desktop.insert(0,"Set as Desktop")
-enter_desktop.grid(row=1, column=2)
+enter_desktop = ttk.Button(frm_images, text="Set as Desktop")
+enter_desktop.grid(row=1, column=2, padx= 10, pady=10)
 
-lbl_dates = ttk.Label (frm_more_images, text="Select Date(YYYY-mm-dd):")
+lbl_dates = ttk.Label(frm_more_images, text="Select Date(YYYY-mm-dd):")
 lbl_dates.grid(row=1, column=3, padx=(10,5), pady=5)
 
 date_pat= 'y-mm-dd'
@@ -79,12 +78,12 @@ enter_dates = DateEntry(frm_more_images, maxdate=v_today, date_pattern=date_pat)
 
 enter_dates.insert(0,"")
 enter_dates.grid(row=1, column=4)
-print (f"fecha seleccionada:{enter_dates.get()}")
+print (f"Fetch Dates:{enter_dates.get()}")
 
-
-enter_downloadI = ttk.Entry(frm_more_images)
-enter_downloadI.insert(0,"Download Image")
-enter_downloadI.grid(row=1, column=5)
+    
+enter_downloadI = ttk.Button(frm_more_images, text="Download Image")
+#enter_downloadI.insert(0)
+enter_downloadI.grid(row=1, column=1, padx=10, pady= 10)
 
 #lbl_image_backg = Label (frm_image_background, image=Photo)
 #lbl_image_backg.grid(row=7, column=1)

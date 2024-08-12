@@ -19,9 +19,9 @@ def main():
 
     get_apod_info(date)
 
-def cleanTitle(v_title):
+def cleanTitle(title):
     # {REQ-18, part 1}
-    v_aux=v_title.strip()           # Leading and trailing spaces are removed
+    v_aux=title.strip()           # Leading and trailing spaces are removed
     v_aux2=v_aux.replace(' ', '_')  # Inner spaces are replaced by '_'
     # Use a regular expression, obtein lettters, numbers and '_'
     v_titleaux = re.findall(r'[a-zA-Z_0-9]+', v_aux2)   
@@ -74,33 +74,14 @@ def get_apod_image_url(apod_info_dict):
     """
     # TODO: Complete the function body
     # Hint: The APOD info dictionary includes a key named 'media_type' that indicates whether the APOD is an image or video
-    v_date ="2023-15-27"
-    #url = NASA_API_URL + v_date
-    url = APOD_DESKTOP_URL
-    resp_msg = requests.get(url, params= params)
-
-    print (resp_msg.url)
-    if resp_msg.status_code == requests.codes.ok:
-           results = resp_msg.json()
-           print(results)
-           print(f"titulo:{results['title']}")
-           url2 = results["url"]
-           # Check if is an image
-           print(results["media_type"])
-           if results["media_type"] == "image":
-               with open("nasa_apod.jpg", "wb") as f:
-                   f.write(requests.get(url2).content)
-           else:
-               # Extract binay content from response message body
-               file_content = resp_msg.content
-               image_hash = hashlib.sha256(file_content).hexdigest
-               print("SE TIENE EL HAS256 DEL VIDEO") 
-               print(image_hash)
-               print (url2)
+    date = apod_desktop.get_apod_date()  
+    apod_info_dict = get_apod_info(date)
+    # If it is an image, get the URL of the high definition image
+    if apod_info_dict['media_type'] == 'image':
+        return apod_info_dict['hdurl']    
+    # If it is a video, get the URL of the video thumbnail
     else:
-        print("No se pudo obtener el archivo")
-        
-    return (results)
+        return apod_info_dict['thumbnail_url']
 
 
     
