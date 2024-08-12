@@ -103,7 +103,7 @@ def init_apod_cache():
         print(f"Image cache database{image_cache_db}")
     
         con = sqlite3.connect('image_cache.db')
-        cur = con.cursor
+        cur = con.cursor()
         image_query = """
     CREATE TABLE IS NOT EXIST IMAGE
     (
@@ -117,8 +117,6 @@ def init_apod_cache():
         cur.excute(image_query)
         con.commit()
         con.close()
-
-
     return
 
 def add_apod_to_cache(apod_date):
