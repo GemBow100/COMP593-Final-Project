@@ -44,7 +44,7 @@ def main():
 
     # Add the APOD for the specified date to the cache
     apod_id = add_apod_to_cache(apod_date)
-
+    print(f"In main ={apod_id}")
     # Get the information for the APOD from the DB
     apod_info = get_apod_info(apod_id)
 
@@ -158,13 +158,19 @@ def add_apod_to_cache(apod_date):
     # Hint: Use a function from image_lib.py to save the image file
     if apod_id == 0:
         image_path = determine_apod_file_path(apod_info['image_title'],apod_info['image_url'])
-
+        apod_id = add_apod_to_db(apod_info ['title'],apod_info['explanation'], image_path, hashvalue)
         image_lib.save_image_file(apod_image,image_path)
     # TODO: Add the APOD information to the DB
     # Hint: Use the add_apod_to_db() function below
-    apod_id = add_apod_to_db(apod_info ['title'],apod_info['explanation'], image_path, hashvalue)
-    add_apod_to_cache(apod_date)
-    return apod_id
+    
+        add_apod_to_cache(apod_date)
+        return apod_id
+    elif apod_id !=0:
+        return apod_id
+    return 0
+    
+
+
 
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
@@ -217,7 +223,7 @@ def get_apod_id_from_db(image_sha256):
     cur =con.cursor()
     cur.execute(f" SELECT id FROM apod WHERE sha256 = ?", (image_sha256))
     
-    apod_id =cur.fetchall()
+    apod_id =cur.fetchone()
     con.close
     if apod_id is not None:
         return apod_id[0]
