@@ -11,11 +11,12 @@ import os
 from PIL import Image
 def main():
     # TODO: Add code to test the functions in this module 
-    image_data = download_image('https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg')
-    image_path = r'C:\temp\kitty.jpg'
-    save_image_file(image_data, image_path)
-    set_desktop_background_image(image_path)
-    return
+    date = apod_desktop.get_apod_date()
+    info = apod_api.get_apod_info(date)
+    url = apod_api.get_apod_image_url(info)
+    bind = download_image(url)
+    save_image_file(bind,".jpg")
+    set_desktop_background_image("*.jpg")
     
 
 def download_image(image_url):

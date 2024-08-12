@@ -29,8 +29,7 @@ import apod_api
 script_dir = os.path.dirname(os.path.abspath(__file__))
 image_cache_dir = os.path.join(script_dir, 'images')
 image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
-APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
-APOD_DESKTOP_URL = 'https://api.nasa.gov/planetary/apod'
+
 
 def main():
     ## DO NOT CHANGE THIS FUNCTION ##
