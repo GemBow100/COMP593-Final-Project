@@ -105,15 +105,15 @@ def init_apod_cache():
         con = sqlite3.connect('image_cache.db')
         cur = con.cursor()
         image_query = """
-    CREATE TABLE IS NOT EXIST IMAGE
-    (
-        id          INTEGER PRIMARY KEY,
-        title       TEXT NOT NULL,
-        explanation TEXT NOT NULL,
-        file_path   TEXT NOT NULL,
-        Sha256     TEXT NOT NULL,
-    );
-"""
+            CREATE TABLE IF NOT EXISTS Image
+            (
+                id          INTEGER PRIMARY KEY,
+                title       TEXT NOT NULL,
+                explanation TEXT NOT NULL,
+                file_path   TEXT NOT NULL,
+                Sha256     TEXT NOT NULL
+            );
+            """
         cur.execute(image_query)
         con.commit()
         con.close()

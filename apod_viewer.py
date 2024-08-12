@@ -2,22 +2,45 @@ from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from tkinter import messagebox
-from PIL import ImageTk, Image, ImageColor
-import tkinter as tk
+from PIL import ImageTk, Image
+import tkinter as ttk
 import apod_desktop
 import datetime
 import os
-
+import ctypes
 # Initialize the image cache
 apod_desktop.init_apod_cache()
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+image_cache_dir = os.path.join(script_dir, 'images')
 
 # TODO: Create the GUI
 root = Tk()
 root.geometry('1000x700')
-
+root.minsize(600,600)
+root.columnconfigure(0,weight=1)
+root.rowconfigure(0, weight=1)
 root.title("Astronomy Picture of the Day Viewer")
-root.iconbitmap("nasa_logo_icon.ico")
-image_bakground = ImageTk.PhotoImage(Image.open("NASA_logo.png").resize((300,300)))
+
+
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Images')
+root.iconbitmap(os.path.join(script_dir, 'nasa_logo_icon.ico'))
+
+# creating the frames
+frm = ttk.Frame(root)
+frm.columnconfigure(0, weight=1)
+frm.rowconfigure(0, weight=1)
+frm.grid(sticky= NSEW)
+
+
+image_path= os.path.join(image_cache_dir, 'NASA_Logo.png')
+Photo= ImageTk.PhotoImage(Image.open(image_path).resize((500,500)))
+
+lbl_image_backg=ttk.Label(frm, image = Photo)
+lbl_image_backg.grid(row=0, padx=(50,0), pady=(20),sticky= N)
+#frm_image_background = ttk.Frame(root)
+#frm_image_background.grid(row=0, column=0)
 
 # Create the frames
 frm_input = ttk.Frame(root)
@@ -25,14 +48,14 @@ frm_input.grid(row=0, column=0, columnspan=2, pady=(20,10))
 
 frm_images = ttk.Frame(root)
 frm_images = ttk.LabelFrame(root, text="View Cached Image")
-frm_images.grid(row=0, column=0, columnspan=2, pady=(10,20))
+frm_images.grid(row=0, column=0, columnspan=2, pady=(10,20), sticky=SW)
 
 frm_more_images = ttk.Frame(root)
 frm_more_images = ttk.LabelFrame(root, text="Get More Images")
-frm_more_images.grid(row=0, column=3, columnspan=2, pady=(10,20), sticky=N)
+frm_more_images.grid(row=0, column=3, columnspan=2, pady=(10,20), sticky=SE)
 
-frm_image_background = ttk.Frame(root)
-frm_image_background.grid(row=7, column=1)
+#frm_image_background = ttk.Frame(root)
+#frm_image_background.grid(row=0, column=0)
 
 #TODO: Populate the user input frame with widgets
 lbl_cached = ttk.Label (frm_images, text="Select Image:")
@@ -63,8 +86,8 @@ enter_downloadI = ttk.Entry(frm_more_images)
 enter_downloadI.insert(0,"Download Image")
 enter_downloadI.grid(row=1, column=5)
 
-lbl_image_backg = Label (frm_image_background, image=image_bakground)
-lbl_image_backg.grid(row=7, column=1)
+#lbl_image_backg = Label (frm_image_background, image=Photo)
+#lbl_image_backg.grid(row=7, column=1)
 
 # Acciones para cada seleccion
 ##btn_get_info =ttk.Button(root, text="Download Image", command= terceroV3.get_apod_date)
