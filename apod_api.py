@@ -6,7 +6,7 @@ Library for interacting with NASA's Astronomy Picture of the Day API.
 import requests
 import json 
 import apod_desktop
-import re
+
 
 APOD_URL = 'https://api.nasa.gov/planetary/apod'
 
