@@ -88,7 +88,7 @@ def init_apod_cache():
     """
     # TODO: Create the image cache directory if it does not already
     print(f"Image cache directory: {image_cache_dir}")
-    if os.path.isfile(image_cache_dir):
+    if os.path.isdir(image_cache_dir):
         print(f"Image cache already exists.")
     else:
         print(f"Image cache already exists.")
