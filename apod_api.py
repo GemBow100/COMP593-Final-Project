@@ -6,6 +6,8 @@ Library for interacting with NASA's Astronomy Picture of the Day API.
 import requests
 import json 
 import apod_desktop
+import hashlib
+import re
 
 APOD_DESKTOP_KEY = 'kedWME7bEfDhDgCTCo17gedoZxZI1Wm14UQyBJqi'
 
@@ -16,6 +18,16 @@ def main():
     date = apod_desktop.get_apod_date()
 
     get_apod_info(date)
+
+def cleanTitle(v_title):
+    # {REQ-18, part 1}
+    v_aux=v_title.strip()           # Leading and trailing spaces are removed
+    v_aux2=v_aux.replace(' ', '_')  # Inner spaces are replaced by '_'
+    # Use a regular expression, obtein lettters, numbers and '_'
+    v_titleaux = re.findall(r'[a-zA-Z_0-9]+', v_aux2)   
+    v_Title=""
+    for titles in v_titleaux:
+        v_Title += titles
     
 
 def get_apod_info(apod_date):
@@ -32,9 +44,9 @@ def get_apod_info(apod_date):
     # Hint: The APOD API uses query string parameters: https://requests.readthedocs.io/en/latest/user/quickstart/#passing-parameters-in-urls
     # Hint: Set the 'thumbs' parameter to True so the info returned for video APODs will include URL of the video thumbnail image 
 
-    apoddate = {'date': apod_date, 'thumbs': True, 'api_key': APOD_DESKTOP_KEY}
+    params = {'date': apod_date, 'thumbs': True, 'api_key': APOD_DESKTOP_KEY}
 
-    respmsg = requests.get(APOD_DESKTOP_URL, params=apoddate)
+    respmsg = requests.get(APOD_DESKTOP_URL, params=params)
 
     print(f"Recieving {apod_date} and information from NASA.", end = " ")
 
@@ -62,13 +74,35 @@ def get_apod_image_url(apod_info_dict):
     """
     # TODO: Complete the function body
     # Hint: The APOD info dictionary includes a key named 'media_type' that indicates whether the APOD is an image or video
-    date = apod_desktop.get_apod_date()
-    apod_info_dict = get_apod_info(date)
+    v_date ="2023-15-27"
+    #url = NASA_API_URL + v_date
+    url = APOD_DESKTOP_URL
+    resp_msg = requests.get(url, params= params)
 
-    if apod_info_dict['media_type'] == 'image':
-        return apod_info_dict ['hdurl']
+    print (resp_msg.url)
+    if resp_msg.status_code == requests.codes.ok:
+           results = resp_msg.json()
+           print(results)
+           print(f"titulo:{results['title']}")
+           url2 = results["url"]
+           # Check if is an image
+           print(results["media_type"])
+           if results["media_type"] == "image":
+               with open("nasa_apod.jpg", "wb") as f:
+                   f.write(requests.get(url2).content)
+           else:
+               # Extract binay content from response message body
+               file_content = resp_msg.content
+               image_hash = hashlib.sha256(file_content).hexdigest
+               print("SE TIENE EL HAS256 DEL VIDEO") 
+               print(image_hash)
+               print (url2)
     else:
-        return apod_info_dict['thumbnail_url']
+        print("No se pudo obtener el archivo")
+        
+    return (results)
+
+
     
 
 if __name__ == '__main__':
