@@ -1,5 +1,5 @@
 """ 
-Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, (Sadia Shoily)
+Team: Joelle Waugh, Manuel Manrique Lopez, Ricardo Rubin, Sadia Shoily
 
 COMP 593 - Final Project
 
@@ -91,7 +91,12 @@ def init_apod_cache():
     """
     # TODO: Create the image cache directory if it does not already
     print(f"Image cache directory: {image_cache_dir}")
-        # {REQ-14} {REQ-15} Create directory
+   # if not os.path.exists(image_cache_dir):
+       #os.makedirs(image_cache_dir)
+        #print(f"Image cache was created.")
+    #else:
+        #print(f"Image cache already exists.")
+     # {REQ-14} {REQ-15} Create directory
     if os.path.isdir(image_cache_dir):
         print(f"image_cache_directory:{image_cache_dir} already exists.")       
     else:           
@@ -108,7 +113,11 @@ def init_apod_cache():
         
 
     # TODO: Create the DB if it does not already exist
-     
+    #print(f"Image cache database: {image_cache_db}")
+    #if not os.path.isfile(image_cache_db):
+       #print(f"Images cache database was created")
+    
+    
         con = sqlite3.connect('image_cache.db')
         cur = con.cursor()
         image_query = """
@@ -161,7 +170,6 @@ def add_apod_to_cache(apod_date):
     # Hint: Use the get_apod_id_from_db() function below
     apod_id = get_apod_id_from_db(hashvalue)
     
-
     # TODO: Save the APOD file to the image cache directory
     # Hint: Use the determine_apod_file_path() function below to determine the image file path
     # Hint: Use a function from image_lib.py to save the image file
@@ -349,7 +357,7 @@ def get_all_apod_titles():
 
     cur.execute(f"SELECT title FROM apod")
 
-    titles =cur.fetchall
+    titles =cur.fetchall()
     return titles
 
 if __name__ == '__main__':
